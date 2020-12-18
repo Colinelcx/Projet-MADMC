@@ -1,5 +1,7 @@
+from IPython.display import clear_output
 import matplotlib.pyplot as plt
 import numpy as np
+import time
 
 def generate_vectors(n, m):
     """
@@ -9,6 +11,7 @@ def generate_vectors(n, m):
     return np.random.normal(loc=m, scale=m/4, size=(n,2))
 
 def naive_pareto(vectors):
+	t = time.time()
 	n,d = vectors.shape
 	mask = np.full(vectors.shape, True, dtype=bool)
 	for i in range(n):
@@ -42,3 +45,20 @@ def show_pareto(vectors, pareto, title=""):
 	plt.ylabel('c2')
 	plt.legend()
 	plt.show()
+
+def update_progress(progress):
+    bar_length = 20
+    if isinstance(progress, int):
+        progress = float(progress)
+    if not isinstance(progress, float):
+        progress = 0
+    if progress < 0:
+        progress = 0
+    if progress >= 1:
+        progress = 1
+        
+    block = int(round(bar_length * progress))
+
+    clear_output(wait = True)
+    text = "Progression: [{0}] {1:.1f}%".format( "#" * block + "-" * (bar_length - block), progress * 100)
+    print(text)
