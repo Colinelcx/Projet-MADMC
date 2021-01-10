@@ -10,7 +10,7 @@ def generate_vectors(n, m):
     """
     return np.random.normal(loc=m, scale=m/4, size=(n,2))
 
-def naive_pareto(vectors):
+def naive_pareto_filter(vectors): # A TESTER
 	t = time.time()
 	n,d = vectors.shape
 	mask = np.full(vectors.shape, True, dtype=bool)
@@ -18,25 +18,28 @@ def naive_pareto(vectors):
 		vector1 = vectors[i]
 		for vector2 in vectors:
 			if vector1[0] > vector2[0] and vector1[1] > vector2[1]:
-				mask[i] = np.full((1,d), False, dtype=bool) # point non Pareto-optimal
+				mask[i] = np.full((1,d), False, dtype=bool) # point Pareto-dominé
+				break
 	pareto = vectors[mask]
 	return pareto.reshape((int(pareto.shape[0]/d),d))
 
-def optimized_pareto(vectors):
+def optimized_pareto_filter(vectors): # A TESTER
 	n, d = vectors.shape
-	mask = np.full(vectors.shape, True, dtype=bool)
+	mask = np.full(vectors.shape, False, dtype=bool)
 	sort_vectors = np.lexsort((vectors[:,1],vectors[:,0]))
 	min_1 = vectors[sort_vectors[0],1]
 	for i in range(1, n):
 		vector = vectors[sort_vectors[i]]
-		if vector[1] > min_1:
-			mask[sort_vectors[i]] = np.full((1,d), False, dtype=bool) # point non Pareto-optimal
-		if vector[1] < min_1:
+		if vector[1] < min_1: # point dominant sur le second critère 
 			min_1 = vector[1]
+			mask[sort_vectors[i]] = np.full((1,d), True, dtype=bool) # point no Pareto-dominé	
+		elif mask[sort_vectors[i]][0]: # le point précédent n'est pas Pareto-dominé
+			if vector[0]==vectors[sort_vectors[i-1],0] and vector[1]==vectors[sort_vectors[i-1],1]:
+				mask[sort_vectors[i]] = np.full((1,d), True, dtype=bool) # point non Pareto-dominé
 	pareto = vectors[mask]
 	return pareto.reshape((int(pareto.shape[0]/d),d))
 
-def show_pareto(vectors, pareto, title=""):
+def show_pareto_front(vectors, pareto, title=""):
 	plt.figure()
 	plt.scatter(vectors[:,0], vectors[:,1], label="data")
 	plt.scatter(pareto[:,0], pareto[:,1],color='red', marker='s',label='points Pareto-optimaux')
