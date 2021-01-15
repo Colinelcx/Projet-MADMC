@@ -3,11 +3,10 @@ import matplotlib.pyplot as plt
 import numpy as np
 import time
 
-def naive_vs_sorted(naive_pareto, optimized_pareto):
+def naive_vs_sorted(naive_pareto, optimized_pareto, nb_iter=50):
     times_naive = []
     times_opti = []
     m = 1000
-    nb_iter=5
     for n in range(200, 10001, 200):
         update_progress(n /(50*200))
         time_naive = time.time()
