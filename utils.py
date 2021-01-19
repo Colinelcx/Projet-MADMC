@@ -35,7 +35,7 @@ def naive_fast_pareto_filter(vectors):
 	pareto = vectors[mask]
 	return pareto.reshape((int(pareto.shape[0]/d),d))
 
-def optimized_pareto_filter(vectors):
+def lexico_pareto_filter(vectors):
 	n, d = vectors.shape
 	mask = np.full(vectors.shape, False, dtype=bool)
 	sort_vectors = np.lexsort((vectors[:,1],vectors[:,0]))
@@ -43,9 +43,9 @@ def optimized_pareto_filter(vectors):
 	min_1 = vectors[sort_vectors[0],1]
 	for i in range(1, n):
 		vector = vectors[sort_vectors[i]]
-		if vector[1] < min_1: # point dominant sur le second critère 
+		if vector[1] < min_1: # point dominant sur le second critère
 			min_1 = vector[1]
-			mask[sort_vectors[i]] = np.full((1,d), True, dtype=bool) # point no Pareto-dominé	
+			mask[sort_vectors[i]] = np.full((1,d), True, dtype=bool) # point no Pareto-dominé
 		elif mask[sort_vectors[i]][0]: # le point précédent n'est pas Pareto-dominé
 			if vector[0]==vectors[sort_vectors[i-1],0] and vector[1]==vectors[sort_vectors[i-1],1]:
 				mask[sort_vectors[i]] = np.full((1,d), True, dtype=bool) # point non Pareto-dominé
@@ -72,7 +72,7 @@ def update_progress(progress):
         progress = 0
     if progress >= 1:
         progress = 1
-        
+
     block = int(round(bar_length * progress))
 
     clear_output(wait = True)
