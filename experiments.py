@@ -3,11 +3,19 @@ import matplotlib.pyplot as plt
 import numpy as np
 import time
 
+######################
+#  Expérimentations  #
+######################
+
+
 def naive_vs_sorted(naive_pareto, optimized_pareto, nb_iter=50):
+    """
+        Compare les temps d'exécutions des algorithmes naive_pareto et optimized_pareto sur nb_iter ensembles de vecteurs générés aléatoirement
+    """
     times_naive = []
     times_opti = []
-    m = 1000
-    for n in range(200, 10001, 200):
+    m = 1000 # espérance de la loi normale pour la génération des vecteurs
+    for n in range(200, 10001, 200): # n = nombre de vecteurs
         update_progress(n /(50*200))
         time_naive = time.time()
         for i in range(nb_iter):

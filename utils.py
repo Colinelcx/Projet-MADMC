@@ -3,6 +3,11 @@ import matplotlib.pyplot as plt
 import numpy as np
 import time
 
+#######################
+#  Fonctions de base  #
+#######################
+
+
 def generate_vectors(n, m):
     """
     	Génère un ensemble de n vecteurs de dimension 2 où les valeurs sont tirés selon une loi normale
@@ -10,7 +15,16 @@ def generate_vectors(n, m):
     """
     return np.random.normal(loc=m, scale=m/4, size=(n,2))
 
+
+#######################
+#  Filtres de Pareto  #
+#######################
+
+
 def naive_pareto_filter(vectors):
+    """
+        Calcule l'ensemble des vecteurs Pareto non-dominés par comparaison par paires systématiques
+    """
 	t = time.time()
 	n,d = vectors.shape
 	mask = np.full(vectors.shape, True, dtype=bool)
@@ -23,6 +37,9 @@ def naive_pareto_filter(vectors):
 	return pareto.reshape((int(pareto.shape[0]/d),d))
 
 def naive_fast_pareto_filter(vectors):
+    """
+        Calcule l'ensemble des vecteurs Pareto non-dominés par comparaison par paires
+    """
 	t = time.time()
 	n,d = vectors.shape
 	mask = np.full(vectors.shape, True, dtype=bool)
@@ -36,6 +53,9 @@ def naive_fast_pareto_filter(vectors):
 	return pareto.reshape((int(pareto.shape[0]/d),d))
 
 def lexico_pareto_filter(vectors):
+    """
+        Calcule l'ensemble des vecteurs Pareto non-dominés par la méthode de tri
+    """
 	n, d = vectors.shape
 	mask = np.full(vectors.shape, False, dtype=bool)
 	sort_vectors = np.lexsort((vectors[:,1],vectors[:,0]))
@@ -45,14 +65,23 @@ def lexico_pareto_filter(vectors):
 		vector = vectors[sort_vectors[i]]
 		if vector[1] < min_1: # point dominant sur le second critère
 			min_1 = vector[1]
-			mask[sort_vectors[i]] = np.full((1,d), True, dtype=bool) # point no Pareto-dominé
+			mask[sort_vectors[i]] = np.full((1,d), True, dtype=bool) # point non Pareto-dominé
 		elif mask[sort_vectors[i]][0]: # le point précédent n'est pas Pareto-dominé
 			if vector[0]==vectors[sort_vectors[i-1],0] and vector[1]==vectors[sort_vectors[i-1],1]:
 				mask[sort_vectors[i]] = np.full((1,d), True, dtype=bool) # point non Pareto-dominé
 	pareto = vectors[mask]
 	return pareto.reshape((int(pareto.shape[0]/d),d))
 
+
+#################################
+#   Affichage et visualisation  #
+#################################
+
+
 def show_pareto_front(vectors, pareto, title=""):
+    """
+        Affiche les vecteurs ainsi que les vecteurs non-dominés
+    """
 	plt.figure()
 	plt.scatter(vectors[:,0], vectors[:,1], label="data")
 	plt.scatter(pareto[:,0], pareto[:,1],color='red', marker='s',label='points Pareto-optimaux')
@@ -63,6 +92,9 @@ def show_pareto_front(vectors, pareto, title=""):
 	plt.show()
 
 def update_progress(progress):
+    """
+        Met à jour la barre de progression (pour jupyter notebook)
+    """
     bar_length = 20
     if isinstance(progress, int):
         progress = float(progress)
