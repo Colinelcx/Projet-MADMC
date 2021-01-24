@@ -196,7 +196,7 @@ def show_pareto_front(vectors, pareto, minimax=None, title=""):
     plt.title("Front de Pareto "+title)
     plt.xlabel("c1")
     plt.ylabel('c2')
-    plt.legend()
+    plt.legend(loc="upper right")
     plt.show()
 
 def update_progress(progress):

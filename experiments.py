@@ -45,9 +45,9 @@ def naive_vs_sorted(naive_pareto, optimized_pareto, nb_iter=50):
 
     return times_naive, times_opti
 
-def compare_procedures(procedure1, procedure2, nb_iter=50):
+def compare_procedures_epsilon(procedure1, procedure2, nb_iter=50):
     """
-        Compare les temps d'exécutions des algorithmes naive_pareto et optimized_pareto sur nb_iter ensembles de vecteurs générés aléatoirement
+        Compare les temps d'exécution
     """
     times_1 = []
     times_2 = []
@@ -82,9 +82,49 @@ def compare_procedures(procedure1, procedure2, nb_iter=50):
     plt.plot(x, times_1, label='procédure Pareto-dominance')
     plt.plot(x, times_2, label="procédure I-dominance")
     plt.title("Comparaison des temps de calcul des deux procédures")
+    plt.xlabel("epsilon")
+    plt.ylabel('temps (s)')
+    plt.legend()
+    plt.show()
+
+    return times_1, times_2
+
+def compare_procedures_n(procedure1, procedure2, alpha_min=0.45, alpha_max=0.55, nb_iter=50):
+    """
+        Compare les temps d'exécution
+    """
+    times_1 = []
+    times_2 = []
+    k = 10 # taille des sous-ensembles
+    m = 1000 # espérance de la loi normale pour la génération des vecteurs
+    for n in range(25, 1000, 25): # n = nombre de vecteurs
+        update_progress(n/1000)
+
+        time_1 = time.time()
+        for i in range(nb_iter):
+            E = generate_vectors(n, m)
+            two_phased_pareto(E, k, alpha_min, alpha_max, show=False)
+        time_1 = (time.time() - time_1) / nb_iter
+
+        time_2 = time.time()
+        for i in range(nb_iter):
+            E = generate_vectors(n, m)
+            two_phased_idominance(E, k, alpha_min, alpha_max, show=False)
+        time_2 = (time.time() - time_2) / nb_iter
+
+        times_1.append(time_1)
+        times_2.append(time_2)
+
+    update_progress(100)
+    
+    x = np.arange(25, 1000, 25)
+    plt.figure()
+    plt.plot(x, times_1, label='procédure Pareto-dominance')
+    plt.plot(x, times_2, label="procédure I-dominance")
+    plt.title("Comparaison des temps de calcul des deux procédures")
     plt.xlabel("n")
     plt.ylabel('temps (s)')
     plt.legend()
     plt.show()
 
-    return times_naive, times_opti
+    return times_1, times_2
